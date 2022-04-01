@@ -1,0 +1,19 @@
+version: '2.4'
+services:
+  api:
+    build:
+      context: ./
+      dockerfile: ./Dockerfile
+    container_name: ip-reputation-api
+    environment:
+        - PYTHONPATH=/publicapi/
+        - TZ=Europe/London
+        - APP_DEBUG=True
+        - ENV=development
+    command: uvicorn main:api --host 0.0.0.0 --port 8000 --reload
+    volumes:
+            - ./config.py:/publicapi/config.py
+            - ./main.py:/publicapi/main.py
+            - ./v1:/publicapi/v1
+    ports:
+            - 8000:8000
