@@ -13,10 +13,11 @@ COPY --from=build-container /usr/local/bin/uvicorn/ /usr/local/bin/uvicorn/
 RUN useradd apiuser
 USER apiuser
 
-ADD config.py  /publicapi/config.py
-ADD main.py  /publicapi/main.py
-ADD v1  /publicapi/v1
-WORKDIR /publicapi
+ADD config.py  /ip_reputation/config.py
+ADD main.py  /ip_reputation/main.py
+ADD v1  /ip_reputation/v1
+ADD model  /ip_reputation/model
+WORKDIR /ip_reputation
 
 ENV PATH="/usr/local/bin/uvicorn:${PATH}"
 ENV LC_ALL=C.UTF-8
