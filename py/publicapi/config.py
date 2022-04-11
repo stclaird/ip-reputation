@@ -1,7 +1,6 @@
 """
 Central Configuration
 """
-
 import os
 
 class General():
@@ -15,9 +14,9 @@ class General():
     API_PREFIX = os.environ.get('API_PREFIX', '/v1')
     SERVER_ENVIRONMENT = os.environ.get('SERVER_ENVIRONMENT', 'localhost')
 
-class Redis():
+class Database():
     """
-    Redis Configuration 
+    DB Settings
     """
-    URL: str = os.environ.get('REDIS_URL','redis://redis')
-    
+    DB_URL = os.environ.get('DB_URL', "localhost")
+    DB_NAME = os.environ.get('DB_NAME', "ip_reputation")

@@ -1,0 +1,58 @@
+version: '3.5'
+services:
+  api:
+    build:
+      context: ./
+      dockerfile: ./Dockerfile
+    container_name: api
+    environment:
+        - PYTHONPATH=/publicapi
+        - DEBUG_MODE=True
+        - DB_NAME=ip_reputation
+        - DB_URL=${DB_URL}
+    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+    volumes:
+            - ./publicapi:/publicapi/
+    ports:
+            - 8000:8000
+    networks:
+      - app_network
+    depends_on: 
+      - mongo
+
+  mongo:
+    image: mongo
+    ports:
+            - "27017:27017"
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_USER}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_PASS}
+      - MONGO_INITDB_DATABASE=ip_reputation
+    networks:
+        - app_network
+    volumes:
+      - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js    
+ 
+  mongo-express:
+    image: mongo-express:0.54
+    ports:
+          - "8081:8081"
+    environment:
+      - ME_CONFIG_OPTIONS_EDITORTHEME=ambiance
+      - ME_CONFIG_BASICAUTH_USERNAME=dev
+      - ME_CONFIG_BASICAUTH_PASSWORD=dev
+      - ME_CONFIG_MONGODB_ADMINUSERNAME=${MONGO_USER}
+      - ME_CONFIG_MONGODB_ADMINPASSWORD=${MONGO_PASS}
+    links:
+      - mongo
+    networks:
+      - app_network 
+
+#Docker Networks
+networks:
+    app_network:
+        driver: bridge
+        ipam:
+          driver: default
+          config:
+            - subnet: 192.168.25.0/24
