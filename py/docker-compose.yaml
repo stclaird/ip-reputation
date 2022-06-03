@@ -3,18 +3,21 @@ services:
   api:
     build:
       context: ./
-      dockerfile: ./Dockerfile
+      dockerfile: ./Dockerfile-API
     container_name: api
     environment:
-        - PYTHONPATH=/publicapi
+        - PYTHONPATH=/app
         - DEBUG_MODE=True
         - DB_NAME=ip_reputation
         - DB_URL=${DB_URL}
-    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+        
+    command: uvicorn publicapi.main:app --host 0.0.0.0 --port 5000 --reload
     volumes:
-            - ./publicapi:/publicapi/
+        - ./publicapi:/app/publicapi/
+        - ./models:/app/models/
+        - ./config.py:/app/config.py
     ports:
-            - 8000:8000
+            - 5000:5000
     networks:
       - app_network
     depends_on: 
@@ -48,6 +51,18 @@ services:
     networks:
       - app_network 
 
+  importer:
+    build:
+      context: ./
+      dockerfile: ./Dockerfile-Importer
+    environment:
+      - PYTHONPATH=/app
+    volumes:
+      - ./importer:/app/importer/
+      - ./config.py:/app/config.py
+    command: python /app/importer/main.py
+    networks:
+      - app_network 
 #Docker Networks
 networks:
     app_network:

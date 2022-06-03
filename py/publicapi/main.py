@@ -1,10 +1,10 @@
 from fastapi import FastAPI
 import uvicorn
 from motor.motor_asyncio import AsyncIOMotorClient
-from config import General, Database
+from config import Api, Database
 
-from v1.routers import ip_router 
-from v1.routers import ip_router
+from .routers import ip_router 
+from .routers import ip_list_router
 
 app = FastAPI()
 
@@ -18,7 +18,7 @@ async def shutdown_db_client():
     app.mongodb_client.close()
 
 app.include_router(ip_router, tags=["ip"], prefix="/ip")
-
+app.include_router(ip_list_router, tags=["iplist"], prefix="/iplist")
 if __name__ == "__main__":
     uvicorn.run(
         "main:app",

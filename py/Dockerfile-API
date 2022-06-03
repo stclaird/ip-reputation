@@ -14,14 +14,13 @@ COPY --from=build-container /usr/local/bin/uvicorn/ /usr/local/bin/uvicorn/
 RUN useradd apiuser
 USER apiuser
 
-ADD publicapi/config /publicapi/config
-ADD publicapi/v1 /publicapi/v1
-ADD publicapi/main.py /publicapi/main.py
+ADD publicapi/ /app/publicapi/
+ADD models/    /app/models
 
-WORKDIR /publicapi
+WORKDIR /app
 
 ENV PATH="/usr/local/bin/uvicorn:${PATH}"
 ENV LC_ALL=C.UTF-8
 ENV LANG=C.UTF-8
 
-CMD ["uvicorn", "main:api", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "main:api", "--host", "0.0.0.0", "--port", "5000"]

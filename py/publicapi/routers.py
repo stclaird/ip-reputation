@@ -1,15 +1,29 @@
+import logging
+
 from fastapi import APIRouter, Body, Request, HTTPException, status
 from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
+from pymongo.errors import DuplicateKeyError
 
-from .models import IPModel
+from models.models import IPModel
 
+logging.basicConfig(level=logging.INFO)
+
+#IP address API
 ip_router = APIRouter()
 
 @ip_router.post("/", response_description="Add new IP")
 async def create_location(request: Request, ip: IPModel = Body(...)):
+
     ip = jsonable_encoder(ip)
-    new_ip = await request.app.mongodb["col_ips"].insert_one(ip)
+    ip['_id'] = ip['ip_address']
+    print(f"IP {ip}")
+    try:
+        new_ip = await request.app.mongodb["col_ips"].insert_one(ip)
+    except (DuplicateKeyError) as error:
+        logging.exception('Duplicate caught')
+        return JSONResponse(status_code=409, content={"message": "Duplicate, IP already exists"})
+    
     created_ip = await request.app.mongodb["col_ips"].find_one(
         {"_id": new_ip.inserted_id}
     )
@@ -18,7 +32,7 @@ async def create_location(request: Request, ip: IPModel = Body(...)):
 
 """Get all IP Addresses"""
 @ip_router.get("/", response_description="Get all IPs")
-async def list_ips(request: Request):
+async def get_ips(request: Request):
 
     ips = []
     for doc in await request.app.mongodb["col_ips"].find().to_list(length=100):
@@ -42,3 +56,15 @@ async def delete_ip(id: str, request: Request):
         return JSONResponse(status_code=status.HTTP_204_NO_CONTENT)
 
     raise HTTPException(status_code=404, detail=f"IP {id} not found")
+
+#API for handling IP address lists (TOR, BOTS etc)
+ip_list_router = APIRouter()
+
+"""Get all IP Address Lists"""
+@ip_list_router.get("/", response_description="Return all the IP address lists")
+async def get_ip_lists(request: Request):
+
+    ip_lists = []
+    for doc in await request.app.mongodb["col_lists"].find().to_list(length=100):
+        ip_lists.append(doc)
+    return ip_lists

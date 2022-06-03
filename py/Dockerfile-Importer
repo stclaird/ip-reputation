@@ -1,0 +1,20 @@
+
+# Build stage:
+FROM python:3.9.5 as build-container
+
+COPY requirements-importer.txt /tmp/requirements.txt
+RUN pip install --upgrade pip
+RUN pip install -r /tmp/requirements.txt
+
+#Actual stage:
+FROM python:3.9.5-slim-buster
+COPY --from=build-container /usr/local/lib/python3.9/site-packages/ /usr/local/lib/python3.9/site-packages
+
+RUN useradd importer
+RUN mkdir /home/importer
+RUN chown -R importer:importer /home/importer
+
+USER importer
+ENV HOME=/home/importer
+ADD /importer/ /app/importer
+WORKDIR /app/importer/

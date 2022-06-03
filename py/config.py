@@ -3,9 +3,9 @@ Central Configuration
 """
 import os
 
-class General():
+class Api():
     """
-    General Configuration
+    API Configuration
     """
     VERSION = 0.1
     DEBUG: bool = os.environ.get('DEBUG', True)
@@ -18,5 +18,11 @@ class Database():
     """
     DB Settings
     """
-    DB_URL = os.environ.get('DB_URL', "localhost")
+    DB_URL = os.environ.get('DB_URL', "mongodb://mongo:mongo@mongo:27017")
     DB_NAME = os.environ.get('DB_NAME', "ip_reputation")
+
+class Importer():
+    """
+    Importer Settings
+    """
+    API_HOST = "http://api:5000/ip/"

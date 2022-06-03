@@ -3,6 +3,8 @@ fastapi
 uvicorn[standard]
 pydantic[email]
 
+requests
+
 # Database
 motor
 dnspython
